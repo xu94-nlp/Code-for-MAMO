@@ -17,5 +17,5 @@ config_settings = {
     'n_epoch': 3,
     'n_inner_loop': 3,
     'active_func': 'leaky_relu',
-    'cuda_option': 'cuda:5'
+    'cuda_option': 'cuda:1'
 }

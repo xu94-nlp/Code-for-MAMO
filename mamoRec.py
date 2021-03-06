@@ -38,12 +38,16 @@ class MAMRec:
                                                                  random_state=self.random_state,
                                                                  train_test_split_ratio=self.split_ratio)
 
-        if dataset == 'movielens':
+        if dataset == 'movielens': #ML= movielen
             self.x1_loading, self.x2_loading = MLUserLoading(embedding_dim=self.embedding_dim).to(self.device), \
                                                MLItemLoading(embedding_dim=self.embedding_dim).to(self.device)
-        else:
+        elif dataset == "bookcrossing": # Book BK = BookCrossing = BK.
             self.x1_loading, self.x2_loading = BKUserLoading(embedding_dim=self.embedding_dim).to(self.device), \
                                                BKItemLoading(embedding_dim=self.embedding_dim).to(self.device)
+        # New Modification needs to be done here.
+        elif dataset == "tv_shows":
+            elf.x1_loading, self.x2_loading =  TSUserLoading(embedding_dim=self.embedding_dim).to(self.device), \
+                                               TSItemLoading(embedding_dim=self.embedding_dim).to(self.device)
 
         self.n_y = default_info[dataset]['n_y']
 
@@ -100,14 +104,21 @@ class MAMRec:
 
     def test_with_meta_optimization(self):
         best_phi_u, best_phi_i, best_phi_r = self.model.get_weights()
+        
+        for iter_num in range(5):
+            user_num = 0
+            acc_ndcg = 0.0
+            for u in self.test_users:
+                bias_term, att_values = user_mem_init(u, self.dataset, self.device, self.FeatureMEM, self.x1_loading,
+                                                    self.alpha)
+                self.model.init_u_mem_weights(best_phi_u, bias_term, self.tao, best_phi_i, best_phi_r)
+                self.model.init_ui_mem_weights(att_values, self.TaskMEM)
 
-        for u in self.test_users:
-            bias_term, att_values = user_mem_init(u, self.dataset, self.device, self.FeatureMEM, self.x1_loading,
-                                                  self.alpha)
-            self.model.init_u_mem_weights(best_phi_u, bias_term, self.tao, best_phi_i, best_phi_r)
-            self.model.init_ui_mem_weights(att_values, self.TaskMEM)
-
-            self.model.init_weights(best_phi_u, best_phi_i, best_phi_r)
-            user_module = LOCALUpdate(self.model, u, self.dataset, self.support_size, self.query_size, self.batch_size,
-                                      self.n_inner_loop, self.rho, top_k=3, device=self.device)
-            user_module.test()
+                self.model.init_weights(best_phi_u, best_phi_i, best_phi_r)
+                user_module = LOCALUpdate(self.model, u, self.dataset, self.support_size, self.query_size, self.batch_size,
+                                        self.n_inner_loop, self.rho, top_k=3, device=self.device)
+                acc_ndcg += user_module.test()
+                user_num += 1
+            print("Iter:", iter_num, "res", acc_ndcg / user_num)
+if __name__ == '__main__':
+    MAMRec('movielens')

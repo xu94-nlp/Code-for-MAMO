@@ -115,7 +115,9 @@ class LOCALUpdate:
 
         # D.I.Y your calculation for the results
         q_pred_y = self.model(self.q_x1, self.q_x2)  # on query set
-
+        ndcg_res = ndcg(y, pred_y)
+        # print("NDCG Result", ndcg_res)
+        return ndcg_res
 
 def maml_train(raw_phi_u, raw_phi_i, raw_phi_r, u_grad_list, i_grad_list, r_grad_list, global_lr):
     phi_u = update_parameters(raw_phi_u, u_grad_list, global_lr)

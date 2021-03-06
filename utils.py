@@ -23,13 +23,19 @@ config = {
     'n_publisher': 5254,
     'n_age_bk': 106,
     'n_location': 65,
+    # TV shows
+    'n_user': 70,
+    'n_service': 7,
+    'n_engagement': 3,
+    'n_tv_genre': 11,
     # sample_size
     'sample_size': 20
 }
 
 default_info = {
     'movielens': {'n_y': 5, 'u_in_dim': 3, 'i_in_dim': 4},
-    'bookcrossing': {'n_y': 10, 'u_in_dim': 2, 'i_in_dim': 3}
+    'bookcrossing': {'n_y': 10, 'u_in_dim': 2, 'i_in_dim': 3},
+    'tv_shows': {'n_y': 3, 'u_in_dim': 1, 'i_in_dim': 2}
 }
 
 

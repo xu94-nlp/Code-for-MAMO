@@ -1,6 +1,6 @@
 from __future__ import print_function
 from prepare_data.prepareMovielens import *
-from prepare_data.prepareBookcrossing import *
+# from prepare_data.prepareBookcrossing import *
 
 
 def id_storing(dataset='movielens', max_count=20):
@@ -104,6 +104,6 @@ if __name__ == '__main__':
     dict_storing()
     data_generation()
     # bookcrossing data generating
-    id_storing(dataset='bookcrossing')
-    dict_storing(dataset='bookcrossing')
-    data_generation(dataset='bookcrossing')
+    # id_storing(dataset='bookcrossing')
+    # dict_storing(dataset='bookcrossing')
+    # data_generation(dataset='bookcrossing')
