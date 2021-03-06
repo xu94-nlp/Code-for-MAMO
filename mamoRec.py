@@ -46,7 +46,7 @@ class MAMRec:
                                                BKItemLoading(embedding_dim=self.embedding_dim).to(self.device)
         # New Modification needs to be done here.
         elif dataset == "tv_shows":
-            elf.x1_loading, self.x2_loading =  TSUserLoading(embedding_dim=self.embedding_dim).to(self.device), \
+            self.x1_loading, self.x2_loading =  TSUserLoading(embedding_dim=self.embedding_dim).to(self.device), \
                                                TSItemLoading(embedding_dim=self.embedding_dim).to(self.device)
 
         self.n_y = default_info[dataset]['n_y']

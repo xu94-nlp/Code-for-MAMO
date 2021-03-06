@@ -18,7 +18,7 @@ class TSUserLoading(torch.nn.Module):
 
 class TSItemLoading(torch.nn.Module):
     def __init__(self, embedding_dim):
-        super(MLItemLoading, self).__init__()
+        super(TSItemLoading, self).__init__()
         self.service_dim = config['n_service']
         self.genre_dim = config['n_tv_genre']
         self.embedding_dim = embedding_dim
