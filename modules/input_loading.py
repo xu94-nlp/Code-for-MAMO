@@ -10,26 +10,32 @@ class TSUserLoading(torch.nn.Module):
         self.embedding_user = torch.nn.Embedding(num_embeddings=self.num_user, embedding_dim=self.embedding_dim)
 
     def forward(self, x1):
+        # print("TSUserLoading x1", x1)
         user_idx = x1[:,0]
         user_idx = user_idx.to(torch.int64)
         user_emb = self.embedding_user(user_idx)
         concat_emb = user_emb
+        # print("TSUserLoading concat_emb", concat_emb)
         return concat_emb
 
 class TSItemLoading(torch.nn.Module):
     def __init__(self, embedding_dim):
-        super(MLItemLoading, self).__init__()
+        super(TSItemLoading, self).__init__()
         self.service_dim = config['n_service']
         self.genre_dim = config['n_tv_genre']
         self.embedding_dim = embedding_dim
 
         self.emb_service = torch.nn.Embedding(num_embeddings=self.service_dim, embedding_dim=self.embedding_dim)
-        self.emb_genre = torch.nn.Linear(in_features=self.genre_dim, out_features=self.embedding_dim, bias=False)
+        self.emb_genre = torch.nn.Embedding(num_embeddings=self.genre_dim, embedding_dim=self.embedding_dim) # in_features -> num_embeddings
 
     def forward(self, x2):
+        # print("TSItemLoading x2", x2)
         service_idx, genre_idx = x2[:,0], x2[:,1]
-        service_emb = self.emb_rate(service_idx.to(torch.int64))
-        genre_emb = self.emb_year(genre_idx.to(torch.int64))
+        service_emb = self.emb_service(service_idx.to(torch.int64))
+        # print("TSItemLoading service_emb", service_emb)
+        # print("TSItemLoading genre_index", genre_idx.to(torch.int64))
+        genre_emb = self.emb_genre(genre_idx.to(torch.int64))
+        # print("TSItemLoading genre_emb", genre_emb)
         # director_emb = F.sigmoid(self.emb_director(director_idx.float()))
         concat_emb = torch.cat((service_emb, genre_emb), 1)
         return concat_emb

@@ -13,8 +13,12 @@ class BASEModel(torch.nn.Module):
         self.rec_model = rec_module
 
     def forward(self, x1, x2):
+        # print("In BASEModel")
+        # print("X1", x1, "X2", x2)
         pu, pi = self.input_user_loading(x1), self.input_item_loading(x2)
         eu, ei = self.user_embedding(pu), self.item_embedding(pi)
+        
+        
         rec_value = self.rec_model(eu, ei)
         return rec_value
 

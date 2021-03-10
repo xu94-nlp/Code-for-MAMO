@@ -46,7 +46,7 @@ class MAMRec:
                                                BKItemLoading(embedding_dim=self.embedding_dim).to(self.device)
         # New Modification needs to be done here.
         elif dataset == "tv_shows":
-            elf.x1_loading, self.x2_loading =  TSUserLoading(embedding_dim=self.embedding_dim).to(self.device), \
+            self.x1_loading, self.x2_loading = TSUserLoading(embedding_dim=self.embedding_dim).to(self.device), \
                                                TSItemLoading(embedding_dim=self.embedding_dim).to(self.device)
 
         self.n_y = default_info[dataset]['n_y']
@@ -121,4 +121,4 @@ class MAMRec:
                 user_num += 1
             print("Iter:", iter_num, "res", acc_ndcg / user_num)
 if __name__ == '__main__':
-    MAMRec('movielens')
+    MAMRec('tv_shows')
