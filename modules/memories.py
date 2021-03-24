@@ -19,7 +19,10 @@ class FeatureMem:
     def read_head(self, p_u, alpha, train=True):
         # get personalized mu
         att_model = Attention(self.n_k).to(self.device)
-        attention_values = att_model(p_u, self.p_memory).to(self.device)  # pu on device
+        """
+        p_u is the raw feature.
+        """
+        attention_values = att_model(p_u, self.p_memory).to(self.device)  # pu on devic
         personalized_mu = get_mu(attention_values, self.u_memory, self.base_model, self.device)
         # update mp
         transposed_att = attention_values.reshape(self.n_k, 1)
@@ -67,8 +70,16 @@ class Attention(torch.nn.Module):
         self.soft_max_layer = torch.nn.Softmax()
 
     def forward(self, pu, mp):
+        # note that len(mp) = n_k
+        # pu from [batch_size, embed_dim] -> [batch_size, embed_dim * n_k] 
+        # -> [n_k , batch_size * embed_dim] // confirmed, batch_size = 1.
+        # mp: [n_k, u_embed_dim]
         expanded_pu = pu.repeat(1, len(mp)).view(len(mp), -1)  # shape, n_k, pu_dim
+        # print("Forward expanded_pu",  expanded_pu.shape)
+        # print("MP", mp.shape)
+        # print("PU", pu.shape)
         inputs = cosine_similarity(expanded_pu, mp)
+        # print("inputs shape", inputs.shape)
         fc_layers = self.fc_layer(inputs)
         attention_values = self.soft_max_layer(fc_layers)
         return attention_values
@@ -76,6 +87,7 @@ class Attention(torch.nn.Module):
 
 def get_mu(att_values, mu, model, device):
     mu0,_,_ = model.get_zero_weights()
+    # len(mu) = n_k, the # of rate levels.
     attention_values = att_values.reshape(len(mu),1)
     for i in range(len(mu)):
         for j in range(len(mu[i])):
@@ -98,7 +110,12 @@ def get_mui(att_values, mui, n_k):
 
 
 def update_mui(att_values, n_k, u_mui):
-    repeat_u_mui = u_mui.unsqueeze(0).repeat(n_k, 1, 1)
+    # print("update_mui", u_mui.shape)
+    repeat_u_mui = u_mui.unsqueeze(0).repeat(n_k, 1, 1) # add external axis at 0.
+    # print("repeat_u_mui.unsqueeze(0)", u_mui.unsqueeze(0).shape)
+    # print("repeat_u_mui", repeat_u_mui.shape)
+    # print("att_values", att_values.shape)
     attention_tensor = att_values.reshape(n_k, 1, 1)
+    # print("reshape att_values", attention_tensor.shape)
     attend_u_mui = torch.mul(attention_tensor, repeat_u_mui)
     return attend_u_mui

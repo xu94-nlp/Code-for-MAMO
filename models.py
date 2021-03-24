@@ -13,8 +13,6 @@ class BASEModel(torch.nn.Module):
         self.rec_model = rec_module
 
     def forward(self, x1, x2):
-        # print("In BASEModel")
-        # print("X1", x1, "X2", x2)
         pu, pi = self.input_user_loading(x1), self.input_item_loading(x2)
         eu, ei = self.user_embedding(pu), self.item_embedding(pi)
         
@@ -23,6 +21,7 @@ class BASEModel(torch.nn.Module):
         return rec_value
 
     def get_weights(self):
+        # Ax + b -> get_params returns matrix A (by count % 2 == 0)
         u_emb_params = get_params(self.user_embedding.parameters())
         i_emb_params = get_params(self.item_embedding.parameters())
         rec_params = get_params(self.rec_model.parameters())
@@ -89,7 +88,7 @@ class LOCALUpdate:
             # on support set
             for i_batch, (x1, x2, y, y0) in enumerate(self.user_data_loader):
                 x1, x2, y = x1.to(self.device), x2.to(self.device), y.to(self.device)
-                pred_y = self.model(x1, x2)
+                pred_y = self.model(x1, x2) # RecModel 
                 loss = self.loss_fn(pred_y, y)
                 self.optimizer.zero_grad()
                 loss.backward()  # local theta updating
@@ -104,7 +103,7 @@ class LOCALUpdate:
 
         u_grad, i_grad, r_grad = self.model.get_grad()
         return u_grad, i_grad, r_grad
-
+ 
     def test(self):
         for i in range(self.n_loop):
             # on support set
@@ -119,6 +118,7 @@ class LOCALUpdate:
 
         # D.I.Y your calculation for the results
         q_pred_y = self.model(self.q_x1, self.q_x2)  # on query set
+        print(q_pred_y)
         ndcg_res = ndcg(y, pred_y)
         # print("NDCG Result", ndcg_res)
         return ndcg_res
